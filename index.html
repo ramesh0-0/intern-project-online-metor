@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StartupMentor - Connect with Industry Experts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #0ea5e9;
+            --dark: #1e293b;
+            --light: #f1f5f9;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        #three-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.2;
+        }
+        
+        .fade-in {
+            animation: fadeIn 1s ease-in;
+            opacity: 0;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .progress-bar {
+            background: #1e293b;
+            border-radius: 4px;
+            overflow: hidden;
+            height: 8px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+        
+        .stat-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .mentor-card {
+            transition: all 0.3s ease;
+            transform: translateY(30px);
+            opacity: 0;
+        }
+        
+        .mentor-card.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .resource-card {
+            transition: all 0.3s ease;
+            transform: translateY(30px);
+            opacity: 0;
+        }
+        
+        .resource-card.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .community-post {
+            border-left: 3px solid var(--primary);
+            transition: all 0.3s ease;
+            transform: translateX(-20px);
+            opacity: 0;
+        }
+        
+        .community-post.visible {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .hero-stats > div {
+                width: 100%;
+            }
+        }
+        
+        .animate-on-scroll {
+            transform: translateY(30px);
+            opacity: 0;
+            transition: transform 0.8s ease, opacity 0.8s ease;
+        }
+        
+        .animate-on-scroll.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="gradient-bg text-gray-100 min-h-screen relative overflow-x-hidden">
+    <!-- 3D Background Canvas -->
+    <div id="three-bg"></div>
+    
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-opacity-90 backdrop-blur-sm bg-slate-900 border-b border-slate-700">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center mr-3">
+                    <i class="fas fa-rocket text-white"></i>
+                </div>
+                <span class="text-xl font-bold">Startup<span class="text-blue-400">Mentor</span></span>
+            </div>
+            
+            <div class="hidden md:flex space-x-8">
+                <a href="#home" class="hover:text-blue-400 transition">Home</a>
+                <a href="#features" class="hover:text-blue-400 transition">Features</a>
+                <a href="#mentors" class="hover:text-blue-400 transition">Mentors</a>
+                <a href="#resources" class="hover:text-blue-400 transition">Resources</a>
+                <a href="#community" class="hover:text-blue-400 transition">Community</a>
+                <a href="#contact" class="hover:text-blue-400 transition">Contact</a>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button class="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 transition" onclick="showAuthModal()">Login</button>
+                <button class="px-4 py-2 rounded-md bg-transparent border border-blue-500 hover:bg-blue-900 transition" onclick="showAuthModal()">Sign Up</button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section id="home" class="pt-32 pb-20 px-4">
+        <div class="container mx-auto max-w-6xl">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="fade-in animate-on-scroll">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-6">Connect with <span class="text-blue-400">Expert Mentors</span> for Your Startup</h1>
+                    <p class="text-xl text-gray-300 mb-8">Join our platform to connect with industry experts, access valuable resources, and grow your startup faster than ever before.</p>
+                    <div class="flex flex-wrap gap-4 mb-10">
+                        <button class="px-8 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 transition transform hover:-translate-y-1" onclick="showAuthModal()">Get Started</button>
+                        <button class="px-8 py-3 rounded-lg bg-slate-800 hover:bg-slate-700 transition transform hover:-translate-y-1">How It Works</button>
+                    </div>
+                    
+                    <div class="hero-stats flex flex-wrap gap-6 mt-8">
+                        <div class="stat-card p-4 rounded-lg flex items-center animate-on-scroll">
+                            <div class="text-3xl font-bold text-blue-400 mr-3">5,000+</div>
+                            <div>Active Mentors</div>
+                        </div>
+                        <div class="stat-card p-4 rounded-lg flex items-center animate-on-scroll">
+                            <div class="text-3xl font-bold text-blue-400 mr-3">50k+</div>
+                            <div>Sessions</div>
+                        </div>
+                        <div class="stat-card p-4 rounded-lg flex items-center animate-on-scroll">
+                            <div class="text-3xl font-bold text-blue-400 mr-3">2,500+</div>
+                            <div>Startups</div>
+                        </div>
+                        <div class="stat-card p-4 rounded-lg flex items-center animate-on-scroll">
+                            <div class="text-3xl font-bold text-blue-400 mr-3">95%</div>
+                            <div>Satisfaction</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="floating animate-on-scroll">
+                        <div class="relative bg-slate-800 rounded-2xl p-6 shadow-2xl">
+                            <div class="flex items-center mb-6">
+                                <div class="w-16 h-16 rounded-full bg-blue-900 flex items-center justify-center">
+                                    <i class="fas fa-user-graduate text-2xl text-blue-400"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-xl font-bold">Startup Founder</h3>
+                                    <p class="text-blue-400">Early Stage</p>
+                                </div>
+                            </div>
+                            <div class="bg-slate-900 p-4 rounded-lg mb-4">
+                                <p class="text-lg mb-2">Looking for mentorship in:</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-3 py-1 bg-blue-900 rounded-full text-sm">Product Development</span>
+                                    <span class="px-3 py-1 bg-blue-900 rounded-full text-sm">Funding Strategy</span>
+                                    <span class="px-3 py-1 bg-blue-900 rounded-full text-sm">Marketing</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-blue-400 font-bold">Recommended Mentors</p>
+                                    <div class="flex mt-2">
+                                        <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold -ml-2 first:ml-0">MC</div>
+                                        <div class="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white text-xs font-bold -ml-2">SJ</div>
+                                        <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white text-xs font-bold -ml-2">DR</div>
+                                        <div class="w-10 h-10 rounded-full bg-yellow-500 flex items-center justify-center text-white text-xs font-bold -ml-2">EW</div>
+                                    </div>
+                                </div>
+                                <button class="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition" onclick="showAuthModal()">Connect</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="absolute -bottom-8 -right-8 w-64 h-64 bg-blue-900 rounded-full opacity-20 blur-3xl animate-on-scroll"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section id="features" class="py-20 px-4">
+        <div class="container mx-auto max-w-6xl">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 animate-on-scroll">Powerful Features for <span class="text-blue-400">Startup Growth</span></h2>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto animate-on-scroll">Everything you need to connect with mentors, access resources, and grow your startup</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="card-hover bg-slate-800 rounded-xl p-6 animate-on-scroll">
+                    <div class="w-14 h-14 rounded-full bg-blue-900 flex items-center justify-center mb-6">
+                        <i class="fas fa-brain text-2xl text-blue-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">AI Matching</h3>
+                    <p class="text-gray-400 mb-4">Our algorithm matches you with perfect mentors based on your startup's needs and goals.</p>
+                    <a href="#" class="text-blue-400 hover:text-blue-300 flex items-center">
+                        Learn More <i class="fas fa-arrow-right ml-2 text-sm"></i>
+                    </a>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="card-hover bg-slate-800 rounded-xl p-6 animate-on-scroll">
+                    <div class="w-14 h-14 rounded-full bg-blue-900 flex items-center justify-center mb-6">
+                        <i class="fas fa-chart-line text-2xl text-blue-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Market Insights</h3>
+                    <p class="text-gray-400 mb-4">Access real-time market trends and competitive analysis to stay ahead.</p>
+                    <a href="#" class="text-blue-400 hover:text-blue-300 flex items-center">
+                        Learn More <i class="fas fa-arrow-right ml-2 text-sm"></i>
+                    </a>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="card-hover bg-slate-800 rounded-xl p-6 animate-on-scroll">
+                    <div class="w-14 h-14 rounded-full bg-blue-900 flex items-center justify-center mb-6">
+                        <i class="fas fa-users text-2xl text-blue-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Community Forums</h3>
+                    <p class="text-gray-400 mb-4">Join discussions and network with other founders and mentors.</p>
+                    <a href="#" class="text-blue-400 hover:text-blue-300 flex items-center">
+                        Learn More <i class="fas fa-arrow-right ml-2 text-sm"></i>
+                    </a>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="card-hover bg-slate-800 rounded-xl p-6 animate-on-scroll">
+                    <div class="w-14 h-14 rounded-full bg-blue-900 flex items-center justify-center mb-6">
+                        <i class="fas fa-book-open text-2xl text-blue-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Resource Library</h3>
+                    <p class="text-gray-400 mb-4">Access our curated collection of templates, guides, and tools.</p>
+                    <a href="#" class="text-blue-400 hover:text-blue-300 flex items-center">
+                        Learn More <i class="fas fa-arrow-right ml-2 text-sm"></i>
+                    </a>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div class="card-hover bg-slate-800 rounded-xl p-6 animate-on-scroll">
+                    <div class="w-14 h-14 rounded-full bg-blue-900 flex items-center justify-center mb-6">
+                        <i class="fas fa-video text-2xl text-blue-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Virtual Meetings</h3>
+                    <p class="text-gray-400 mb-4">Schedule and conduct virtual meetings directly through our platform.</p>
+                    <a href="#" class="text-blue-400 hover:text-blue-300 flex items-center">
+                        Learn More <i class="fas fa-arrow-right ml-2 text-sm"></i>
+                    </a>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div class="card-hover bg-slate-800 rounded-xl p-6 animate-on-scroll">
+                    <div class="w-14 h-14 rounded-full bg-blue-900 flex items-center justify-center mb-6">
+                        <i class="fas fa-chart-pie text-2xl text-blue-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Progress Tracking</h3>
+                    <p class="text-gray-400 mb-4">Monitor your startup's growth with our dashboard and metrics.</p>
+                    <a href="#" class="text-blue-400 hover:text-blue-300 flex items-center">
+                        Learn More <i class="fas fa-arrow-right ml-2 text-sm"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-20 px-4 bg-slate-900">
+        <div class="container mx-auto max-w-6xl">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 animate-on-scroll">How <span class="text-blue-400">StartupMentor</span> Works</h2>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto animate-on-scroll">Simple steps to connect with mentors and accelerate your startup</p>
+            </div>
+            
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="text-center animate-on-scroll">
+                    <div class="mx-auto w-20 h-20 rounded-full bg-blue-900 flex items-center justify-center mb-6">
+                        <span class="text-2xl font-bold text-blue-400">1</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Create Profile</h3>
+                    <p class="text-gray-400">Sign up and complete your startup profile with details about your business and goals.</p>
+                </div>
+                
+                <div class="text-center animate-on-scroll">
+                    <div class="mx-auto w-20 h-20 rounded-full bg-blue-900 flex items-center justify-center mb-6">
+                        <span class="text-2xl font-bold text-blue-400">2</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Get Matched</h3>
+                    <p class="text-gray-400">Our AI algorithm matches you with the most suitable mentors based on your needs.</p>
+                </div>
+                
+                <div class="text-center animate-on-scroll">
+                    <div class="mx-auto w-20 h-20 rounded-full bg-blue-900 flex items-center justify-center mb-6">
+                        <span class="text-2xl font-bold text-blue-400">3</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Connect & Learn</h3>
+                    <p class="text-gray-400">Schedule meetings, join discussions, and learn from experienced mentors.</p>
+                </div>
+                
+                <div class="text-center animate-on-scroll">
+                    <div class="mx-auto w-20 h-20 rounded-full bg-blue-900 flex items-center justify-center mb-6">
+                        <span class="text-2xl font-bold text-blue-400">4</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Grow Your Startup</h3>
+                    <p class="text-gray-400">Apply what you learn, track your progress, and take your startup to the next level.</p>
+                </div>
+            </div>
+            
+            <div class="mt-20 bg-slate-800 rounded-2xl p-8 md:p-12 animate-on-scroll">
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4">Advanced Matching Algorithm</h3>
+                        <p class="text-gray-300 mb-6">Our proprietary algorithm analyzes dozens of factors to ensure perfect mentor-startup matches:</p>
+                        <ul class="space-y-3">
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-blue-400 mr-3"></i>
+                                <span>Industry expertise alignment</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-blue-400 mr-3"></i>
+                                <span>Startup stage compatibility</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-blue-400 mr-3"></i>
+                                <span>Geographical preferences</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-blue-400 mr-3"></i>
+                                <span>Communication style matching</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-blue-400 mr-3"></i>
+                                <span>Availability synchronization</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="relative">
+                        <div class="bg-slate-900 rounded-xl p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h4 class="text-lg font-bold">Matching Score</h4>
+                                <span class="px-3 py-1 bg-blue-900 rounded-full text-sm">94% Match</span>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span>Industry</span>
+                                        <span>95%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-700 rounded-full h-2.5">
+                                        <div class="bg-blue-500 h-2.5 rounded-full" style="width: 95%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span>Expertise</span>
+                                        <span>92%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-700 rounded-full h-2.5">
+                                        <div class="bg-blue-500 h-2.5 rounded-full" style="width: 92%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span>Goals</span>
+                                        <span>89%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-700 rounded-full h-2.5">
+                                        <div class="bg-blue-500 h-2.5 rounded-full" style="width: 89%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span>Availability</span>
+                                        <span>97%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-700 rounded-full h-2.5">
+                                        <div class="bg-blue-500 h-2.5 rounded-full" style="width: 97%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-8 flex justify-center">
+                                <button class="px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-700 transition" onclick="showAuthModal()">View Mentor Profile</button>
+                            </div>
+                        </div>
+                        <div class="absolute -top-6 -right-6 w-32 h-32 bg-blue-500 rounded-full opacity-10 blur-3xl animate-on-scroll"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Mentors Section -->
+    <section id="mentors" class="py-20 px-4">
+        <div class="container mx-auto max-w-6xl">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 animate-on-scroll">Meet Our <span class="text-blue-400">Expert Mentors</span></h2>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto animate-on-scroll">Connect with industry leaders who can guide your startup to success</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Mentor 1 -->
+                <div class="mentor-card bg-slate-800 rounded-xl p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-white text-xl font-bold mr-4">MC</div>
+                        <div>
+                            <h3 class="text-lg font-bold">Michael Chen</h3>
+                            <p class="text-blue-400 text-sm">Tech Entrepreneur</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 mb-4">Founded 3 successful SaaS companies. Expert in product development and scaling tech startups.</p>
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-sm">15+ Years Exp</span>
+                        <span class="text-yellow-400">★★★★★</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-2 py-1 bg-blue-900 rounded text-xs">SaaS</span>
+                        <span class="px-2 py-1 bg-blue-900 rounded text-xs">Product</span>
+                        <span class="px-2 py-1 bg-blue-900 rounded text-xs">Scaling</span>
+                    </div>
+                    <button class="w-full py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition" onclick="showAuthModal()">Book Session</button>
+                </div>
+                
+                <!-- Mentor 2 -->
+                <div class="mentor-card bg-slate-800 rounded-xl p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-16 h-16 rounded-full bg-purple-500 flex items-center justify-center text-white text-xl font-bold mr-4">SJ</div>
+                        <div>
+                            <h3 class="text-lg font-bold">Sarah Johnson</h3>
+                            <p class="text-blue-400 text-sm">Marketing Expert</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 mb-4">Former CMO at Fortune 500 companies. Specializes in digital marketing and brand strategy.</p>
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-sm">12+ Years Exp</span>
+                        <span class="text-yellow-400">★★★★★</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-2 py-1 bg-blue-900 rounded text-xs">Marketing</span>
+                        <span class="px-2 py-1 bg-blue-900 rounded text-xs">Branding</span>
+                        <span class="px-2 py-1 bg-blue-900 rounded text-xs">Growth</span>
+                    </div>
+                    <button class="w-full py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition" onclick="showAuthModal()">Book Session</button>
+                </div>
+                
+                <!-- Mentor 3 -->
+                <div class="mentor-card bg-slate-800 rounded-xl p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center text-white text-xl font-bold mr-4">DR</div>
+                        <div>
+                            <h3 class="text-lg font-bold">David Rodriguez</h3>
+                            <p class="text-blue-400 text-sm">Finance Expert</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 mb-4">Investment banker turned startup advisor. Helps with fundraising and financial strategy.</p>
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-sm">18+ Years Exp</span>
+                        <span class="text-yellow-400">★★★★★</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-2 py-1 bg-blue-900 rounded text-xs">Finance</span>
+                        <span class="px-2 py-1 bg-blue-900 rounded text-xs">Fundraising</span>
+                        <span class="px-2 py-1 bg-blue-900 rounded text-xs">Strategy</span>
+                    </div>
+                    <button class="w-full py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition" onclick="showAuthModal()">Book Session</button>
+                </div>
+                
+                <!-- Mentor 4 -->
+                <div class="mentor-card bg-slate-800 rounded-xl p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-16 h-16 rounded-full bg-yellow-500 flex items-center justify-center text-white text-xl font-bold mr-4">EW</div>
+                        <div>
+                            <h3 class="text-lg font-bold">Emily Watson</h3>
+                            <p class="text-blue-400 text-sm">Operations Expert</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 mb-4">Serial entrepreneur with expertise in operations, team building, and business development.</p>
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-sm">10+ Years Exp</span>
+                        <span class="text-yellow-400">★★★★★</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-2 py-1 bg-blue-900 rounded text-xs">Operations</span>
+                        <span class="px-2 py-1 bg-blue-900 rounded text-xs">Team Building</span>
+                        <span class="px-2 py-1 bg-blue-900 rounded text-xs">BizDev</span>
+                    </div>
+                    <button class="w-full py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition" onclick="showAuthModal()">Book Session</button>
+                </div>
+            </div>
+            
+            <div class="mt-12 text-center animate-on-scroll">
+                <button class="px-8 py-3 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 transition">View All Mentors</button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Resources Section -->
+    <section id="resources" class="py-20 px-4 bg-slate-900">
+        <div class="container mx-auto max-w-6xl">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 animate-on-scroll">Startup <span class="text-blue-400">Resources & Tools</span></h2>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto animate-on-scroll">Essential resources to accelerate your startup journey</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Resource 1 -->
+                <div class="resource-card bg-slate-800 rounded-xl p-6">
+                    <div class="w-12 h-12 rounded-full bg-blue-900 flex items-center justify-center mb-4">
+                        <i class="fas fa-file-alt text-blue-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Business Plan Template</h3>
+                    <p class="text-gray-400 mb-4">Comprehensive template used by successful startups to secure funding and plan growth.</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm">2,547 downloads</span>
+                        <button class="px-4 py-2 bg-blue-600 rounded text-sm hover:bg-blue-700 transition">Download</button>
+                    </div>
+                </div>
+                
+                <!-- Resource 2 -->
+                <div class="resource-card bg-slate-800 rounded-xl p-6">
+                    <div class="w-12 h-12 rounded-full bg-blue-900 flex items-center justify-center mb-4">
+                        <i class="fas fa-chalkboard-teacher text-blue-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Pitch Deck Masterclass</h3>
+                    <p class="text-gray-400 mb-4">Learn how to create compelling pitch decks that get investors excited about your startup.</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm">2.5 hours</span>
+                        <button class="px-4 py-2 bg-blue-600 rounded text-sm hover:bg-blue-700 transition">Start Course</button>
+                    </div>
+                </div>
+                
+                <!-- Resource 3 -->
+                <div class="resource-card bg-slate-800 rounded-xl p-6">
+                    <div class="w-12 h-12 rounded-full bg-blue-900 flex items-center justify-center mb-4">
+                        <i class="fas fa-search text-blue-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Market Research Kit</h3>
+                    <p class="text-gray-400 mb-4">Complete toolkit for conducting market research, including survey templates and analysis frameworks.</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm">15 tools included</span>
+                        <button class="px-4 py-2 bg-blue-600 rounded text-sm hover:bg-blue-700 transition">Access Tools</button>
+                    </div>
+                </div>
+                
+                <!-- Resource 4 -->
+                <div class="resource-card bg-slate-800 rounded-xl p-6">
+                    <div class="w-12 h-12 rounded-full bg-blue-900 flex items-center justify-center mb-4">
+                        <i class="fas fa-chart-line text-blue-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Financial Model Builder</h3>
+                    <p class="text-gray-400 mb-4">Professional-grade financial modeling template with automated calculations and projections.</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm">Advanced formulas</span>
+                        <button class="px-4 py-2 bg-blue-600 rounded text-sm hover:bg-blue-700 transition">Download</button>
+                    </div>
+                </div>
+                
+                <!-- Resource 5 -->
+                <div class="resource-card bg-slate-800 rounded-xl p-6">
+                    <div class="w-12 h-12 rounded-full bg-blue-900 flex items-center justify-center mb-4">
+                        <i class="fas fa-balance-scale text-blue-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Legal Document Library</h3>
+                    <p class="text-gray-400 mb-4">Essential legal documents for startups including NDAs, employment agreements, and terms of service.</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm">Lawyer reviewed</span>
+                        <button class="px-4 py-2 bg-blue-600 rounded text-sm hover:bg-blue-700 transition">Browse</button>
+                    </div>
+                </div>
+                
+                <!-- Resource 6 -->
+                <div class="resource-card bg-slate-800 rounded-xl p-6">
+                    <div class="w-12 h-12 rounded-full bg-blue-900 flex items-center justify-center mb-4">
+                        <i class="fas fa-bullhorn text-blue-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Marketing Playbook</h3>
+                    <p class="text-gray-400 mb-4">Step-by-step marketing strategies and tactics used by successful startups to acquire customers.</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm">120 pages</span>
+                        <button class="px-4 py-2 bg-blue-600 rounded text-sm hover:bg-blue-700 transition">Read Guide</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-12 text-center animate-on-scroll">
+                <button class="px-8 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 transition">Explore All Resources</button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Community Section -->
+    <section id="community" class="py-20 px-4">
+        <div class="container mx-auto max-w-6xl">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 animate-on-scroll">Join Our <span class="text-blue-400">Startup Community</span></h2>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto animate-on-scroll">Connect with fellow entrepreneurs, share experiences, and learn from others</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-slate-800 rounded-xl p-6">
+                    <h3 class="text-xl font-bold mb-6 animate-on-scroll">Recent Discussions</h3>
+                    <div class="space-y-6">
+                        <div class="community-post bg-slate-900 p-4 rounded-lg">
+                            <div class="flex items-center mb-2">
+                                <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm font-bold mr-3">AT</div>
+                                <div>
+                                    <h4 class="font-bold">Alex Thompson</h4>
+                                    <p class="text-sm text-gray-400">SaaS Founder</p>
+                                </div>
+                                <div class="ml-auto text-sm text-gray-400">2 hours ago</div>
+                            </div>
+                            <p class="mb-2">How to validate your MVP before launch?</p>
+                            <div class="flex items-center text-sm text-gray-400">
+                                <i class="fas fa-comment mr-1"></i> 12 comments
+                                <i class="fas fa-heart ml-4 mr-1"></i> 24 likes
+                            </div>
+                        </div>
+                        
+                        <div class="community-post bg-slate-900 p-4 rounded-lg">
+                            <div class="flex items-center mb-2">
+                                <div class="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white text-sm font-bold mr-3">MG</div>
+                                <div>
+                                    <h4 class="font-bold">Maria Garcia</h4>
+                                    <p class="text-sm text-gray-400">E-commerce</p>
+                                </div>
+                                <div class="ml-auto text-sm text-gray-400">4 hours ago</div>
+                            </div>
+                            <p class="mb-2">Successful funding round - lessons learned</p>
+                            <div class="flex items-center text-sm text-gray-400">
+                                <i class="fas fa-comment mr-1"></i> 8 comments
+                                <i class="fas fa-heart ml-4 mr-1"></i> 42 likes
+                            </div>
+                        </div>
+                        
+                        <div class="community-post bg-slate-900 p-4 rounded-lg">
+                            <div class="flex items-center mb-2">
+                                <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white text-sm font-bold mr-3">JW</div>
+                                <div>
+                                    <h4 class="font-bold">James Wilson</h4>
+                                    <p class="text-sm text-gray-400">AI/ML</p>
+                                </div>
+                                <div class="ml-auto text-sm text-gray-400">6 hours ago</div>
+                            </div>
+                            <p class="mb-2">Team building in early stages - any advice?</p>
+                            <div class="flex items-center text-sm text-gray-400">
+                                <i class="fas fa-comment mr-1"></i> 15 comments
+                                <i class="fas fa-heart ml-4 mr-1"></i> 36 likes
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="w-full py-3 bg-blue-600 rounded-lg hover:bg-blue-700 transition mt-6 animate-on-scroll">Join the Discussion</button>
+                </div>
+                
+                <div class="bg-slate-800 rounded-xl p-6">
+                    <h3 class="text-xl font-bold mb-6 animate-on-scroll">Community Stats</h3>
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="stat-card p-4 rounded-lg text-center animate-on-scroll">
+                            <div class="text-3xl font-bold text-blue-400 mb-2">15,000+</div>
+                            <p>Active Members</p>
+                        </div>
+                        <div class="stat-card p-4 rounded-lg text-center animate-on-scroll">
+                            <div class="text-3xl font-bold text-blue-400 mb-2">5,200+</div>
+                            <p>Discussions</p>
+                        </div>
+                        <div class="stat-card p-4 rounded-lg text-center animate-on-scroll">
+                            <div class="text-3xl font-bold text-blue-400 mb-2">25,000+</div>
+                            <p>Helpful Answers</p>
+                        </div>
+                        <div class="stat-card p-4 rounded-lg text-center animate-on-scroll">
+                            <div class="text-3xl font-bold text-blue-400 mb-2">850+</div>
+                            <p>Success Stories</p>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-xl font-bold mb-4 animate-on-scroll">Community Features</h3>
+                    <ul class="space-y-3 mb-6">
+                        <li class="flex items-center animate-on-scroll">
+                            <i class="fas fa-check-circle text-blue-400 mr-3"></i>
+                            <span>Industry-specific groups</span>
+                        </li>
+                        <li class="flex items-center animate-on-scroll">
+                            <i class="fas fa-check-circle text-blue-400 mr-3"></i>
+                            <span>Weekly expert AMAs</span>
+                        </li>
+                        <li class="flex items-center animate-on-scroll">
+                            <i class="fas fa-check-circle text-blue-400 mr-3"></i>
+                            <span>Startup showcase events</span>
+                        </li>
+                        <li class="flex items-center animate-on-scroll">
+                            <i class="fas fa-check-circle text-blue-400 mr-3"></i>
+                            <span>Collaboration opportunities</span>
+                        </li>
+                    </ul>
+                    
+                    <div class="bg-slate-900 p-4 rounded-lg animate-on-scroll">
+                        <h4 class="font-bold mb-2">Upcoming Event</h4>
+                        <p class="mb-2"><i class="fas fa-calendar-alt text-blue-400 mr-2"></i> June 30, 2025 | 2:00 PM PST</p>
+                        <p class="mb-3"><i class="fas fa-user text-blue-400 mr-2"></i> VC Funding Strategies with Mark Richardson</p>
+                        <button class="w-full py-2 bg-blue-600 rounded hover:bg-blue-700 transition">RSVP Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 px-4 bg-slate-900">
+        <div class="container mx-auto max-w-6xl">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 animate-on-scroll">Get In <span class="text-blue-400">Touch</span></h2>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto animate-on-scroll">Have questions? Reach out to our team for assistance</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-12">
+                <div>
+                    <form class="bg-slate-800 rounded-xl p-6 animate-on-scroll">
+                        <h3 class="text-xl font-bold mb-6">Send us a Message</h3>
+                        <div class="grid md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-gray-400 mb-2">First Name</label>
+                                <input type="text" class="w-full bg-slate-900 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-gray-400 mb-2">Last Name</label>
+                                <input type="text" class="w-full bg-slate-900 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-400 mb-2">Email Address</label>
+                            <input type="email" class="w-full bg-slate-900 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-400 mb-2">Subject</label>
+                            <input type="text" class="w-full bg-slate-900 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-gray-400 mb-2">Message</label>
+                            <textarea rows="4" class="w-full bg-slate-900 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        </div>
+                        <button class="w-full py-3 bg-blue-600 rounded-lg hover:bg-blue-700 transition">Send Message</button>
+                    </form>
+                </div>
+                
+                <div>
+                    <div class="bg-slate-800 rounded-xl p-6 h-full animate-on-scroll">
+                        <h3 class="text-xl font-bold mb-6">Contact Information</h3>
+                        
+                        <div class="space-y-6">
+                            <div class="flex items-start animate-on-scroll">
+                                <div class="w-12 h-12 rounded-full bg-blue-900 flex items-center justify-center mr-4">
+                                    <i class="fas fa-map-marker-alt text-blue-400"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold mb-1">Our Office</h4>
+                                    <p class="text-gray-400">123 Innovation Drive, Tech Hub, CA 94105</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start animate-on-scroll">
+                                <div class="w-12 h-12 rounded-full bg-blue-900 flex items-center justify-center mr-4">
+                                    <i class="fas fa-phone text-blue-400"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold mb-1">Phone Number</h4>
+                                    <p class="text-gray-400">+1 (555) 123-4567</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start animate-on-scroll">
+                                <div class="w-12 h-12 rounded-full bg-blue-900 flex items-center justify-center mr-4">
+                                    <i class="fas fa-envelope text-blue-400"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold mb-1">Email Address</h4>
+                                    <p class="text-gray-400">hello@startupmentor.com</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start animate-on-scroll">
+                                <div class="w-12 h-12 rounded-full bg-blue-900 flex items-center justify-center mr-4">
+                                    <i class="fas fa-clock text-blue-400"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold mb-1">Business Hours</h4>
+                                    <p class="text-gray-400">Mon-Fri: 9AM-6PM PST</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 animate-on-scroll">
+                            <h4 class="font-bold mb-4">Frequently Asked Questions</h4>
+                            <div class="space-y-4">
+                                <div class="border-b border-slate-700 pb-4">
+                                    <p class="font-medium mb-2">How do I find the right mentor?</p>
+                                    <p class="text-sm text-gray-400">Our AI-powered matching system analyzes your goals, industry, and experience to suggest the most compatible mentors.</p>
+                                </div>
+                                <div class="border-b border-slate-700 pb-4">
+                                    <p class="font-medium mb-2">What's the cost of mentorship sessions?</p>
+                                    <p class="text-sm text-gray-400">Pricing varies by mentor and session type. Most sessions range from $50-200 per hour, with package deals available.</p>
+                                </div>
+                                <div>
+                                    <p class="font-medium mb-2">Can I become a mentor on the platform?</p>
+                                    <p class="text-sm text-gray-400">Yes! We're always looking for experienced entrepreneurs and industry experts. Apply through our mentor application process.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="py-20 px-4">
+        <div class="container mx-auto max-w-4xl text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6 animate-on-scroll">Ready to Accelerate Your <span class="text-blue-400">Startup Journey</span>?</h2>
+            <p class="text-xl text-gray-300 mb-10 max-w-2xl mx-auto animate-on-scroll">Join thousands of startups and mentors already growing together on our platform</p>
+            
+            <div class="flex flex-wrap justify-center gap-4">
+                <button class="px-8 py-4 rounded-lg bg-blue-600 hover:bg-blue-700 transition transform hover:-translate-y-1 animate-on-scroll" onclick="showAuthModal()">Sign Up as a Startup</button>
+                <button class="px-8 py-4 rounded-lg bg-slate-800 hover:bg-slate-700 transition transform hover:-translate-y-1 animate-on-scroll" onclick="showAuthModal()">Apply as a Mentor</button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="pt-16 pb-8 px-4 border-t border-slate-800">
+        <div class="container mx-auto max-w-6xl">
+            <div class="grid md:grid-cols-4 gap-8 mb-12">
+                <div>
+                    <div class="flex items-center mb-6 animate-on-scroll">
+                        <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center mr-3">
+                            <i class="fas fa-rocket text-white"></i>
+                        </div>
+                        <span class="text-xl font-bold">Startup<span class="text-blue-400">Mentor</span></span>
+                    </div>
+                    <p class="text-gray-400 mb-6 animate-on-scroll">Connecting startups with expert mentors to drive innovation and growth.</p>
+                    <div class="flex space-x-4 animate-on-scroll">
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-blue-600 transition">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-blue-600 transition">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-blue-600 transition">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-6 animate-on-scroll">Platform</h4>
+                    <ul class="space-y-3">
+                        <li class="animate-on-scroll"><a href="#" class="text-gray-400 hover:text-blue-400 transition">For Startups</a></li>
+                        <li class="animate-on-scroll"><a href="#" class="text-gray-400 hover:text-blue-400 transition">For Mentors</a></li>
+                        <li class="animate-on-scroll"><a href="#" class="text-gray-400 hover:text-blue-400 transition">Matching Process</a></li>
+                        <li class="animate-on-scroll"><a href="#" class="text-gray-400 hover:text-blue-400 transition">Resources</a></li>
+                        <li class="animate-on-scroll"><a href="#" class="text-gray-400 hover:text-blue-400 transition">Community</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-6 animate-on-scroll">Company</h4>
+                    <ul class="space-y-3">
+                        <li class="animate-on-scroll"><a href="#" class="text-gray-400 hover:text-blue-400 transition">About Us</a></li>
+                        <li class="animate-on-scroll"><a href="#" class="text-gray-400 hover:text-blue-400 transition">Careers</a></li>
+                        <li class="animate-on-scroll"><a href="#" class="text-gray-400 hover:text-blue-400 transition">Blog</a></li>
+                        <li class="animate-on-scroll"><a href="#" class="text-gray-400 hover:text-blue-400 transition">Press</a></li>
+                        <li class="animate-on-scroll"><a href="#" class="text-gray-400 hover:text-blue-400 transition">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-6 animate-on-scroll">Newsletter</h4>
+                    <p class="text-gray-400 mb-4 animate-on-scroll">Subscribe to receive the latest startup insights and platform updates.</p>
+                    <form class="flex animate-on-scroll">
+                        <input type="email" placeholder="Your email" class="px-4 py-2 bg-slate-800 rounded-l-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button class="px-4 py-2 bg-blue-600 rounded-r-lg hover:bg-blue-700 transition">Join</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="pt-8 border-t border-slate-800 text-center text-gray-500 text-sm animate-on-scroll">
+                <p>&copy; 2025 StartupMentor. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-800 rounded-2xl w-full max-w-md relative">
+            <button class="absolute top-4 right-4 text-gray-400 hover:text-white" onclick="hideAuthModal()">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            
+            <div class="p-8">
+                <h2 class="text-2xl font-bold mb-6 text-center">Welcome to StartupMentor</h2>
+                
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <button id="login-tab" class="py-3 rounded-lg bg-blue-900 text-blue-400 font-medium">Login</button>
+                    <button id="register-tab" class="py-3 rounded-lg bg-slate-700 text-gray-400 font-medium">Register</button>
+                </div>
+                
+                <!-- Login Form -->
+                <div id="login-form">
+                    <div class="mb-4">
+                        <label class="block text-gray-400 mb-2">Email</label>
+                        <input type="email" class="w-full bg-slate-900 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-400 mb-2">Password</label>
+                        <input type="password" class="w-full bg-slate-900 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-400 mb-2">Role</label>
+                        <select class="w-full bg-slate-900 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="startup">Startup</option>
+                            <option value="mentor">Mentor</option>
+                        </select>
+                    </div>
+                    <button class="w-full py-3 bg-blue-600 rounded-lg hover:bg-blue-700 transition">Login</button>
+                </div>
+                
+                <!-- Register Form -->
+                <div id="register-form" class="hidden">
+                    <div class="mb-4">
+                        <label class="block text-gray-400 mb-2">Full Name</label>
+                        <input type="text" class="w-full bg-slate-900 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-400 mb-2">Email</label>
+                        <input type="email" class="w-full bg-slate-900 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-400 mb-2">Password</label>
+                        <input type="password" class="w-full bg-slate-900 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-400 mb-2">Role</label>
+                        <select class="w-full bg-slate-900 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="startup">Startup</option>
+                            <option value="mentor">Mentor</option>
+                        </select>
+                    </div>
+                    <button class="w-full py-3 bg-blue-600 rounded-lg hover:bg-blue-700 transition">Create Account</button>
+                </div>
+                
+                <div class="mt-6 text-center text-sm text-gray-400">
+                    <p>By continuing, you agree to our <a href="#" class="text-blue-400 hover:underline">Terms of Service</a> and <a href="#" class="text-blue-400 hover:underline">Privacy Policy</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize Three.js background
+        function initThreeBackground() {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('three-bg').appendChild(renderer.domElement);
+            
+            // Create particles
+            const particles = [];
+            const particleCount = 1000;
+            
+            const particleGeometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            
+            for (let i = 0; i < particleCount; i++) {
+                const i3 = i * 3;
+                positions[i3] = (Math.random() - 0.5) * 200;
+                positions[i3 + 1] = (Math.random() - 0.5) * 200;
+                positions[i3 + 2] = (Math.random() - 0.5) * 200;
+            }
+            
+            particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            
+            const particleMaterial = new THREE.PointsMaterial({
+                color: 0x0ea5e9,
+                size: 0.7,
+                transparent: true,
+                opacity: 0.7
+            });
+            
+            const particleSystem = new THREE.Points(particleGeometry, particleMaterial);
+            scene.add(particleSystem);
+            
+            camera.position.z = 50;
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+            
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                // Rotate particles
+                particleSystem.rotation.x += 0.001;
+                particleSystem.rotation.y += 0.001;
+                
+                // Move particles for parallax effect
+                const time = Date.now() * 0.0001;
+                const positions = particleGeometry.attributes.position.array;
+                
+                for (let i = 0; i < positions.length; i += 3) {
+                    positions[i] += Math.sin(time + positions[i]) * 0.01;
+                    positions[i + 1] += Math.cos(time + positions[i + 1]) * 0.01;
+                }
+                
+                particleGeometry.attributes.position.needsUpdate = true;
+                
+                renderer.render(scene, camera);
+            }
+            
+            animate();
+        }
+        
+        // Initialize tab functionality
+        function initTabs() {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remove active class from all buttons and contents
+                    tabBtns.forEach(b => b.classList.remove('bg-blue-900', 'text-blue-400'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    btn.classList.add('bg-blue-900', 'text-blue-400');
+                    
+                    // Show corresponding content
+                    const tabId = btn.getAttribute('data-tab') + '-tab';
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        }
+        
+        // Initialize scroll animations
+        function initScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        // For mentor cards and other specific animations
+                        if (entry.target.classList.contains('mentor-card') || 
+                            entry.target.classList.contains('resource-card') ||
+                            entry.target.classList.contains('community-post')) {
+                            entry.target.classList.add('visible');
+                        }
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+            
+            document.querySelectorAll('section').forEach(section => {
+                observer.observe(section);
+            });
+            
+            // Observe all animate-on-scroll elements
+            document.querySelectorAll('.animate-on-scroll').forEach(el => {
+                observer.observe(el);
+            });
+            
+            // Observe mentor cards
+            document.querySelectorAll('.mentor-card').forEach(el => {
+                observer.observe(el);
+            });
+            
+            // Observe resource cards
+            document.querySelectorAll('.resource-card').forEach(el => {
+                observer.observe(el);
+            });
+            
+            // Observe community posts
+            document.querySelectorAll('.community-post').forEach(el => {
+                observer.observe(el);
+            });
+        }
+        
+        // Auth modal functions
+        function showAuthModal() {
+            document.getElementById('auth-modal').classList.remove('hidden');
+            document.getElementById('auth-modal').classList.add('flex');
+        }
+        
+        function hideAuthModal() {
+            document.getElementById('auth-modal').classList.add('hidden');
+            document.getElementById('auth-modal').classList.remove('flex');
+        }
+        
+        // Tab switching for auth modal
+        document.getElementById('login-tab').addEventListener('click', function() {
+            document.getElementById('login-tab').classList.add('bg-blue-900', 'text-blue-400');
+            document.getElementById('login-tab').classList.remove('bg-slate-700', 'text-gray-400');
+            document.getElementById('register-tab').classList.add('bg-slate-700', 'text-gray-400');
+            document.getElementById('register-tab').classList.remove('bg-blue-900', 'text-blue-400');
+            document.getElementById('login-form').classList.remove('hidden');
+            document.getElementById('register-form').classList.add('hidden');
+        });
+        
+        document.getElementById('register-tab').addEventListener('click', function() {
+            document.getElementById('register-tab').classList.add('bg-blue-900', 'text-blue-400');
+            document.getElementById('register-tab').classList.remove('bg-slate-700', 'text-gray-400');
+            document.getElementById('login-tab').classList.add('bg-slate-700', 'text-gray-400');
+            document.getElementById('login-tab').classList.remove('bg-blue-900', 'text-blue-400');
+            document.getElementById('register-form').classList.remove('hidden');
+            document.getElementById('login-form').classList.add('hidden');
+        });
+        
+        // Close modal when clicking outside
+        document.getElementById('auth-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideAuthModal();
+            }
+        });
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initThreeBackground();
+            initTabs();
+            initScrollAnimations();
+        });
+    </script>
+</body>
+</html>
